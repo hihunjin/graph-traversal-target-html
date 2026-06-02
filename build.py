@@ -194,8 +194,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
     <div class="desc" style="padding-left:0">Toggle each independently — a target
       shows only its own nodes; each traversal toggles its own path.</div>
+    <button class="reset" onclick="clearOverlays()">Hide all</button>
     <div id="targets"></div>
-    <button class="reset" onclick="clearOverlays()">Clear / hide all</button>
 
     <h2>Detail</h2>
     <div id="detail" class="muted">Tick a target or a traversal to show it.</div>

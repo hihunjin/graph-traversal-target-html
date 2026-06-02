@@ -1,4 +1,4 @@
-# graph-html
+# graph-traversal-target-html
 
 Build a single, **self-contained** interactive graph-visualization HTML file from a
 JSON dataset. The output embeds both your data and the [vis-network](https://visjs.github.io/vis-network/)
