@@ -122,9 +122,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   html, body {{ margin: 0; height: 100%; font-family: system-ui, sans-serif; }}
   #app {{ display: flex; height: 100vh; }}
   #net {{ flex: 1; min-width: 0; }}
+  #divider {{ flex: 0 0 6px; cursor: col-resize; background: #ddd;
+    border-left: 1px solid #ccc; }}
+  #divider:hover, #divider.dragging {{ background: #b8b8b8; }}
   #side {{
-    width: 280px; box-sizing: border-box; padding: 14px 16px;
-    border-left: 1px solid #ddd; overflow-y: auto; background: #fafafa;
+    flex: 0 0 280px; width: 280px; box-sizing: border-box; padding: 14px 16px;
+    overflow-y: auto; background: #fafafa;
   }}
   #side h2 {{ font-size: 13px; text-transform: uppercase; letter-spacing: .05em;
     color: #666; margin: 18px 0 8px; }}
@@ -144,11 +147,23 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .tgt .trav .item {{ font-weight: 400; padding: 3px 10px; }}
   .desc {{ font-size: 12px; color: #888; padding: 0 10px 6px 30px; }}
   .noreach {{ font-size: 11px; color: #c0392b; font-weight: 600; }}
+  /* CSS triangle button: points down when expanded, rotates to point right
+     when collapsed. */
+  .caret {{ cursor: pointer; user-select: none; display: inline-block;
+    width: 0; height: 0; margin-right: 8px; vertical-align: middle;
+    border-left: 5px solid transparent; border-right: 5px solid transparent;
+    border-top: 7px solid #888; transition: transform .12s ease; }}
+  .caret:hover {{ border-top-color: #555; }}
+  .tgt.collapsed .caret {{ transform: rotate(-90deg); }}
+  .tgt.collapsed .trav, .tgt.collapsed .selall {{ display: none; }}
+  .selall {{ padding: 2px 10px 4px 26px; }}
+  .selall button {{ font-size: 11px; padding: 1px 7px; margin-right: 4px; cursor: pointer; }}
 </style>
 </head>
 <body>
 <div id="app">
   <div id="net"></div>
+  <div id="divider"></div>
   <div id="side">
     <h2>Legend</h2>
     <div id="legend" class="legend"></div>
@@ -251,6 +266,11 @@ if (HAS_SCORES) document.getElementById("modeRow").style.display = "flex";
 const nodes = new vis.DataSet([]);
 const edges = new vis.DataSet([]);
 
+// Remembers where each node sat so re-shown nodes return to the same spot
+// instead of being re-laid-out (which looks like the graph "shaking").
+const posCache = {{}};
+let firstRender = true;
+
 const network = new vis.Network(
   document.getElementById("net"),
   {{ nodes, edges }},
@@ -260,6 +280,21 @@ const network = new vis.Network(
     nodes: {{ font: {{ size: 14 }} }},
   }}
 );
+
+// Remember resting positions so re-shown nodes return to the same spot, then
+// switch physics off so toggling boxes never re-runs the layout. Nodes stay
+// draggable (no `fixed`) — physics is simply idle until new nodes need placing.
+network.on("stabilized", () => {{
+  const pos = network.getPositions();
+  for (const id of Object.keys(pos)) posCache[id] = pos[id];
+  network.setOptions({{ physics: false }});
+}});
+
+// Persist a node's spot after the user drags it, so it survives re-renders.
+network.on("dragEnd", () => {{
+  const pos = network.getPositions();
+  for (const id of Object.keys(pos)) posCache[id] = pos[id];
+}});
 
 const detail = document.getElementById("detail");
 
@@ -278,12 +313,17 @@ function nodeView(id, role, travCol) {{
     traversal: {{ bg: travCol || TRAVERSAL_COLOR, border: "#444",  bw: 3, size: 20 }},
     neighbor:  {{ bg: colorOf(n.type),          border: "#999",    bw: 1, size: 13 }},
   }}[role];
-  return {{
+  const view = {{
     id, label: n.label, title: tooltip(n), shape: "dot",
     size: style.size, borderWidth: style.bw,
     color: {{ background: style.bg, border: style.border }},
     opacity: role === "neighbor" ? 0.6 : 1,
   }};
+  // Re-shown node: place it back where it was so the layout doesn't shift,
+  // but leave it draggable (no `fixed`).
+  const p = posCache[id];
+  if (p) {{ view.x = p.x; view.y = p.y; }}
+  return view;
 }}
 
 // pathCol: the traversal color if this edge lies on a ticked path, else null/undefined.
@@ -332,9 +372,10 @@ function reachesTarget(tr) {{
 }}
 
 // distinct color per traversal id, so overlapping paths stay distinguishable
+// No red/reddish hues — red is reserved for target nodes.
 const TRAV_PALETTE = [
-  "#b07aa1", "#4e79a7", "#f28e2b", "#59a14f", "#e15759",
-  "#76b7b2", "#edc948", "#9c755f", "#ff9da7", "#af7aa1",
+  "#4e79a7", "#f28e2b", "#59a14f", "#76b7b2", "#edc948",
+  "#9c755f", "#6a8cc4", "#8cae6a", "#c49a6a", "#7a9aa1",
 ];
 function travColor(trId) {{
   let i = 0;
@@ -412,7 +453,14 @@ function render() {{
 
   nodes.clear(); edges.clear();
   nodes.add(visNodes); edges.add(visEdges);
-  network.fit();
+  // Run physics only when this render introduces nodes we've never placed;
+  // anchored (cached) nodes barely move, and `stabilized` turns physics off
+  // again afterward. With no new nodes, the layout stays put — no shake.
+  const hasNew = visNodes.some(v => !(v.id in posCache));
+  if (hasNew) network.setOptions({{ physics: true }});
+  // Only frame the graph on the first show; later toggles keep the current view
+  // (and pinned positions) so nothing shakes or zooms.
+  if (firstRender) {{ network.fit(); firstRender = false; }}
 
   detail.className = "";
   const modeLabel = (HAS_SCORES && mode === "sorted") ? "sorted by score" : "random";
@@ -528,19 +576,77 @@ function renderTargetList() {{
     const rateTxt = travs.length
       ? ` <span class="noreach" title="no-reach rate">${{Math.round(rate * 100)}}%</span>` : "";
     const on = checked.has(t.id) ? " checked" : "";
-    return `<div class="tgt">
-      <label class="item">${{swatch(TARGET_COLOR)}}
-        <input type="checkbox" class="tgt-toggle" value="${{t.id}}"${{on}} onchange="render()">
-        ${{t.name}} <span class="muted">(${{t.nodeIds.length}} nodes, ${{travs.length}} in)</span>${{rateTxt}}</label>
+    const isCollapsed = collapsed.has(t.id);
+    const tid = JSON.stringify(t.id);
+    const selAll = travs.length ? `<div class="selall">
+        <button onclick='setTravs(${{tid}}, true)'>all on</button>
+        <button onclick='setTravs(${{tid}}, false)'>all off</button>
+      </div>` : "";
+    return `<div class="tgt${{isCollapsed ? " collapsed" : ""}}" data-tid="${{t.id}}">
+      <div class="item">
+        <span class="caret" onclick='toggleCollapse(${{tid}})'></span>${{swatch(TARGET_COLOR)}}
+        <label style="display:inline-flex; align-items:center; gap:6px; flex:1; cursor:pointer">
+          <input type="checkbox" class="tgt-toggle" value="${{t.id}}"${{on}} onchange="render()">
+          ${{t.name}} <span class="muted">(${{t.nodeIds.length}} nodes, ${{travs.length}} in)</span>${{rateTxt}}</label>
+      </div>
       ${{t.description ? `<div class="desc">${{t.description}}</div>` : ""}}
+      ${{selAll}}
       <div class="trav">${{travHtml}}</div>
     </div>`;
   }}).join("") || '<div class="item muted">none</div>';
 }}
 
+// Collapsed target cards (by target id). Toggling just flips the .collapsed
+// class so checkbox state is untouched.
+const collapsed = new Set();
+function toggleCollapse(tid) {{
+  if (collapsed.has(tid)) collapsed.delete(tid); else collapsed.add(tid);
+  const card = document.querySelector(`.tgt[data-tid="${{CSS.escape(tid)}}"]`);
+  if (card) card.classList.toggle("collapsed", collapsed.has(tid));
+}}
+
+// Check or uncheck all of one target's traversal boxes, then re-render.
+function setTravs(tid, on) {{
+  (byTarget[tid] || []).forEach(tr => {{
+    const cb = document.querySelector(`.trav-toggle[value="${{CSS.escape(tr.id)}}"]`);
+    if (cb) cb.checked = on;
+  }});
+  render();
+}}
+
+// Start with every target collapsed (traversals hidden) by default.
+(DATA.targets || []).forEach(t => collapsed.add(t.id));
 renderTargetList();
 
 // --- detail panel on click ---
+// --- draggable sidebar divider ---
+(function () {{
+  const divider = document.getElementById("divider");
+  const side = document.getElementById("side");
+  let dragging = false;
+  const MIN = 180, MAX_MARGIN = 240;  // min width; keep at least this much for the graph
+  divider.addEventListener("mousedown", e => {{
+    dragging = true; divider.classList.add("dragging");
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "col-resize";
+    e.preventDefault();
+  }});
+  document.addEventListener("mousemove", e => {{
+    if (!dragging) return;
+    let w = window.innerWidth - e.clientX;          // distance from cursor to right edge
+    w = Math.max(MIN, Math.min(w, window.innerWidth - MAX_MARGIN));
+    side.style.flexBasis = w + "px";
+    side.style.width = w + "px";
+  }});
+  document.addEventListener("mouseup", () => {{
+    if (!dragging) return;
+    dragging = false; divider.classList.remove("dragging");
+    document.body.style.userSelect = "";
+    document.body.style.cursor = "";
+    network.redraw();   // canvas size changed — repaint
+  }});
+}})();
+
 network.on("click", params => {{
   if (params.nodes.length) {{
     const n = NODE[params.nodes[0]];
