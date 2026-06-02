@@ -1,0 +1,9 @@
+[project]
+name = "graph-html"
+version = "0.1.0"
+description = "Build self-contained interactive graph HTML (vis-network) from a JSON dataset."
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+graph-html = "build:main"

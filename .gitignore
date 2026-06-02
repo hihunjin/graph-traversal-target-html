@@ -1,0 +1,19 @@
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
+.uv/
+
+# Cached vis-network library (re-downloaded by build.py on first run)
+.vis-network.min.js
+
+# Generated graph artifacts (rebuilt from *.json via build.py)
+*.html
+*.json
+
+# Claude Code local settings (machine-specific)
+.claude/settings.local.json
+memory/
+
+# OS / editor
+.DS_Store

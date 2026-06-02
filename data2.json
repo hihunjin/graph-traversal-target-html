@@ -1,0 +1,101 @@
+{
+  "graph": {
+    "nodes": [
+      { "id": "e_transformer", "label": "Transformer", "type": "concept",
+        "properties": { "kind": "model architecture", "mentions": 14 } },
+      { "id": "e_attention", "label": "Self-Attention", "type": "concept",
+        "properties": { "kind": "mechanism", "mentions": 9 } },
+      { "id": "e_rnn", "label": "Recurrent Neural Network", "type": "concept",
+        "properties": { "kind": "model architecture", "mentions": 6 } },
+      { "id": "e_seq2seq", "label": "Sequence-to-Sequence", "type": "concept",
+        "properties": { "kind": "task", "mentions": 5 } },
+
+      { "id": "e_vaswani", "label": "Vaswani et al.", "type": "person",
+        "properties": { "role": "authors", "mentions": 4 } },
+      { "id": "e_google", "label": "Google Brain", "type": "org",
+        "properties": { "mentions": 3 } },
+
+      { "id": "e_aiayn", "label": "\"Attention Is All You Need\"", "type": "document",
+        "properties": { "year": 2017, "venue": "NeurIPS" } },
+      { "id": "e_bert", "label": "BERT", "type": "concept",
+        "properties": { "kind": "model", "mentions": 4 } },
+      { "id": "e_translation", "label": "Machine Translation", "type": "task",
+        "properties": { "mentions": 7 } },
+      { "id": "e_longrange", "label": "Long-Range Dependencies", "type": "concept",
+        "properties": { "kind": "problem", "mentions": 5 } }
+    ],
+    "edges": [
+      { "id": "r3",  "source": "e_vaswani",     "target": "e_transformer", "label": "introduced" },
+      { "id": "r4",  "source": "e_vaswani",     "target": "e_aiayn",       "label": "authored" },
+      { "id": "r5",  "source": "e_aiayn",       "target": "e_transformer", "label": "proposes" },
+      { "id": "r6",  "source": "e_transformer", "target": "e_attention",   "label": "based on" },
+      { "id": "r7",  "source": "e_attention",   "target": "e_longrange",   "label": "captures" },
+      { "id": "r8",  "source": "e_rnn",         "target": "e_longrange",   "label": "struggles with" },
+      { "id": "r9",  "source": "e_transformer", "target": "e_rnn",         "label": "replaces" },
+      { "id": "r10", "source": "e_transformer", "target": "e_translation", "label": "applied to" },
+      { "id": "r11", "source": "e_seq2seq",     "target": "e_translation", "label": "used for" },
+      { "id": "r12", "source": "e_transformer", "target": "e_seq2seq",     "label": "improves" },
+      { "id": "r13", "source": "e_vaswani",     "target": "e_google",      "label": "affiliated with" },
+      { "id": "r14", "source": "e_bert",        "target": "e_transformer", "label": "built on" },
+      { "id": "r15", "source": "e_bert",        "target": "e_attention",   "label": "uses" }
+    ]
+  },
+  "targets": [
+    {
+      "id": "doc1",
+      "name": "Transformer (chunk 3)",
+      "nodeIds": ["e_transformer", "e_attention"],
+      "description": "“The Transformer is a model architecture eschewing recurrence and instead relying entirely on a self-attention mechanism to draw global dependencies between input and output.” — Attention Is All You Need, §2"
+    },
+    {
+      "id": "doc2",
+      "name": "Authorship (chunk 1)",
+      "nodeIds": ["e_vaswani", "e_aiayn"],
+      "description": "“Attention Is All You Need (Vaswani et al., 2017) was published at NeurIPS and introduced the Transformer.” — survey, p.4"
+    },
+    {
+      "id": "doc3",
+      "name": "Motivation (chunk 7)",
+      "nodeIds": ["e_rnn", "e_longrange"],
+      "description": "“Recurrent models struggle to learn long-range dependencies because signal must traverse many sequential steps; attention shortens this path to O(1).” — Attention Is All You Need, §1"
+    }
+  ],
+  "traversals": [
+    {
+      "id": "hop1",
+      "targetId": "doc2",
+      "name": "author of transformer",
+      "start": "e_vaswani",
+      "paths": [
+        { "nodes": ["e_vaswani", "e_aiayn"], "edges": ["r4"], "endpoint": "e_aiayn" }
+      ]
+    },
+    {
+      "id": "hop2",
+      "targetId": "doc1",
+      "name": "transformer → attention",
+      "start": "e_transformer",
+      "paths": [
+        { "nodes": ["e_transformer", "e_attention"], "edges": ["r6"], "endpoint": "e_attention" }
+      ]
+    },
+    {
+      "id": "hop3",
+      "targetId": "doc3",
+      "name": "problem it solved",
+      "start": "e_transformer",
+      "paths": [
+        { "nodes": ["e_transformer", "e_rnn", "e_longrange"], "edges": ["r9", "r8"], "endpoint": "e_longrange" }
+      ]
+    },
+    {
+      "id": "hop4",
+      "targetId": "doc1",
+      "name": "author → affiliation (no chunk hit)",
+      "start": "e_vaswani",
+      "paths": [
+        { "nodes": ["e_vaswani", "e_google"], "edges": ["r13"], "endpoint": "e_google" }
+      ]
+    }
+  ]
+}

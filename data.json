@@ -1,0 +1,511 @@
+{
+  "graph": {
+    "nodes": [
+      {
+        "id": "u1",
+        "label": "Alice",
+        "type": "user"
+      },
+      {
+        "id": "u2",
+        "label": "Bob",
+        "type": "user"
+      },
+      {
+        "id": "u3",
+        "label": "Carol",
+        "type": "user"
+      },
+      {
+        "id": "u4",
+        "label": "Dave",
+        "type": "user"
+      },
+      {
+        "id": "u5",
+        "label": "Erin",
+        "type": "user"
+      },
+      {
+        "id": "d1",
+        "label": "Phone-1",
+        "type": "device"
+      },
+      {
+        "id": "d2",
+        "label": "Phone-2",
+        "type": "device"
+      },
+      {
+        "id": "d3",
+        "label": "Laptop-1",
+        "type": "device"
+      },
+      {
+        "id": "a1",
+        "label": "Acct-A1",
+        "type": "account"
+      },
+      {
+        "id": "a2",
+        "label": "Acct-A2",
+        "type": "account"
+      },
+      {
+        "id": "a3",
+        "label": "Acct-B1",
+        "type": "account"
+      },
+      {
+        "id": "a4",
+        "label": "Acct-B2",
+        "type": "account"
+      },
+      {
+        "id": "a5",
+        "label": "Acct-C1",
+        "type": "account"
+      },
+      {
+        "id": "a6",
+        "label": "Acct-C2",
+        "type": "account"
+      },
+      {
+        "id": "a7",
+        "label": "Acct-Hub",
+        "type": "account"
+      },
+      {
+        "id": "m1",
+        "label": "Merch-1",
+        "type": "merchant"
+      },
+      {
+        "id": "m2",
+        "label": "Merch-2",
+        "type": "merchant"
+      },
+      {
+        "id": "x1",
+        "label": "Mule-1",
+        "type": "account"
+      },
+      {
+        "id": "x2",
+        "label": "Mule-2",
+        "type": "account"
+      },
+      {
+        "id": "x3",
+        "label": "Mule-3",
+        "type": "account"
+      }
+    ],
+    "edges": [
+      {
+        "id": "e1",
+        "source": "u1",
+        "target": "d1",
+        "label": "owns",
+        "score": 0.95
+      },
+      {
+        "id": "e2",
+        "source": "u2",
+        "target": "d2",
+        "label": "owns",
+        "score": 0.6
+      },
+      {
+        "id": "e3",
+        "source": "u3",
+        "target": "d3",
+        "label": "owns"
+      },
+      {
+        "id": "e4",
+        "source": "d1",
+        "target": "a1",
+        "label": "login",
+        "score": 0.88
+      },
+      {
+        "id": "e5",
+        "source": "d2",
+        "target": "a3",
+        "label": "login",
+        "score": 0.83
+      },
+      {
+        "id": "e6",
+        "source": "d3",
+        "target": "a5",
+        "label": "login"
+      },
+      {
+        "id": "e7",
+        "source": "a1",
+        "target": "a2",
+        "label": "transfer",
+        "score": 0.72
+      },
+      {
+        "id": "e8",
+        "source": "a2",
+        "target": "a7",
+        "label": "transfer",
+        "score": 0.91
+      },
+      {
+        "id": "e9",
+        "source": "a3",
+        "target": "a4",
+        "label": "transfer",
+        "score": 0.45
+      },
+      {
+        "id": "e10",
+        "source": "a4",
+        "target": "a7",
+        "label": "transfer",
+        "score": 0.78
+      },
+      {
+        "id": "e11",
+        "source": "a5",
+        "target": "a6",
+        "label": "transfer",
+        "score": 0.5
+      },
+      {
+        "id": "e12",
+        "source": "a6",
+        "target": "a7",
+        "label": "transfer",
+        "score": 0.67
+      },
+      {
+        "id": "e13",
+        "source": "a7",
+        "target": "x1",
+        "label": "transfer",
+        "score": 0.99
+      },
+      {
+        "id": "e14",
+        "source": "a7",
+        "target": "x2",
+        "label": "transfer",
+        "score": 0.93
+      },
+      {
+        "id": "e15",
+        "source": "x1",
+        "target": "x3",
+        "label": "transfer"
+      },
+      {
+        "id": "e16",
+        "source": "u4",
+        "target": "a3",
+        "label": "co-signer"
+      },
+      {
+        "id": "e17",
+        "source": "u5",
+        "target": "a5",
+        "label": "co-signer"
+      },
+      {
+        "id": "e18",
+        "source": "a2",
+        "target": "m1",
+        "label": "payment",
+        "score": 0.55
+      },
+      {
+        "id": "e19",
+        "source": "a4",
+        "target": "m1",
+        "label": "payment"
+      },
+      {
+        "id": "e20",
+        "source": "a6",
+        "target": "m2",
+        "label": "payment"
+      },
+      {
+        "id": "e21",
+        "source": "u1",
+        "target": "u2",
+        "label": "knows"
+      },
+      {
+        "id": "e22",
+        "source": "u2",
+        "target": "u3",
+        "label": "knows"
+      },
+      {
+        "id": "e23",
+        "source": "u4",
+        "target": "u5",
+        "label": "knows"
+      },
+      {
+        "id": "e24",
+        "source": "x2",
+        "target": "m2",
+        "label": "payment"
+      },
+      {
+        "id": "e25",
+        "source": "a1",
+        "target": "a7",
+        "label": "transfer",
+        "score": 0.3
+      },
+      {
+        "id": "e26",
+        "source": "a3",
+        "target": "a7",
+        "label": "transfer"
+      },
+      {
+        "id": "e27",
+        "source": "d1",
+        "target": "a2",
+        "label": "login"
+      },
+      {
+        "id": "e28",
+        "source": "a7",
+        "target": "a6",
+        "label": "transfer"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "id": "t1",
+      "name": "Mule cluster",
+      "nodeIds": [
+        "x1",
+        "x2",
+        "x3"
+      ],
+      "description": "Suspected mule accounts receiving funds from the hub"
+    },
+    {
+      "id": "t2",
+      "name": "Hub account",
+      "nodeIds": [
+        "a7"
+      ],
+      "description": "Central account aggregating multiple inflows"
+    },
+    {
+      "id": "t3",
+      "name": "Cash-out merchants",
+      "nodeIds": [
+        "m1",
+        "m2"
+      ],
+      "description": "Merchant endpoints used to cash out"
+    }
+  ],
+  "traversals": [
+    {
+      "id": "tr1",
+      "targetId": "t1",
+      "name": "Alice -> Mule cluster",
+      "start": "u1",
+      "paths": [
+        {
+          "nodes": [
+            "u1",
+            "d1",
+            "a1",
+            "a2",
+            "a7",
+            "x1"
+          ],
+          "edges": [
+            "e1",
+            "e4",
+            "e7",
+            "e8",
+            "e13"
+          ],
+          "endpoint": "x1"
+        }
+      ]
+    },
+    {
+      "id": "tr2",
+      "targetId": "t1",
+      "name": "Bob -> Mule cluster",
+      "start": "u2",
+      "paths": [
+        {
+          "nodes": [
+            "u2",
+            "d2",
+            "a3",
+            "a4",
+            "a7",
+            "x2"
+          ],
+          "edges": [
+            "e2",
+            "e5",
+            "e9",
+            "e10",
+            "e14"
+          ],
+          "endpoint": "x2"
+        }
+      ]
+    },
+    {
+      "id": "tr3",
+      "targetId": "t1",
+      "name": "Carol -> Mule cluster",
+      "start": "u3",
+      "paths": [
+        {
+          "nodes": [
+            "u3",
+            "d3",
+            "a5",
+            "a6",
+            "a7",
+            "x1",
+            "x3"
+          ],
+          "edges": [
+            "e3",
+            "e6",
+            "e11",
+            "e12",
+            "e13",
+            "e15"
+          ],
+          "endpoint": "x3"
+        }
+      ]
+    },
+    {
+      "id": "tr4",
+      "targetId": "t2",
+      "name": "Alice -> Hub",
+      "start": "u1",
+      "paths": [
+        {
+          "nodes": [
+            "u1",
+            "d1",
+            "a2",
+            "a7"
+          ],
+          "edges": [
+            "e1",
+            "e27",
+            "e8"
+          ],
+          "endpoint": "a7"
+        }
+      ]
+    },
+    {
+      "id": "tr5",
+      "targetId": "t2",
+      "name": "Dave -> Hub",
+      "start": "u4",
+      "paths": [
+        {
+          "nodes": [
+            "u4",
+            "a3",
+            "a4",
+            "a7"
+          ],
+          "edges": [
+            "e16",
+            "e9",
+            "e10"
+          ],
+          "endpoint": "a7"
+        }
+      ]
+    },
+    {
+      "id": "tr6",
+      "targetId": "t3",
+      "name": "Bob -> Merchant",
+      "start": "u2",
+      "paths": [
+        {
+          "nodes": [
+            "u2",
+            "d2",
+            "a3",
+            "a4",
+            "m1"
+          ],
+          "edges": [
+            "e2",
+            "e5",
+            "e9",
+            "e19"
+          ],
+          "endpoint": "m1"
+        }
+      ]
+    },
+    {
+      "id": "tr7",
+      "targetId": "t3",
+      "name": "Erin -> Merchant",
+      "start": "u5",
+      "paths": [
+        {
+          "nodes": [
+            "u5",
+            "a5",
+            "a6",
+            "m2"
+          ],
+          "edges": [
+            "e17",
+            "e11",
+            "e20"
+          ],
+          "endpoint": "m2"
+        }
+      ]
+    },
+    {
+      "id": "tr8",
+      "targetId": "t2",
+      "name": "Social chain (never reaches Hub)",
+      "start": "u3",
+      "paths": [
+        {
+          "nodes": [
+            "u3",
+            "u2",
+            "u1"
+          ],
+          "edges": [
+            "e22",
+            "e21"
+          ],
+          "endpoint": "u1"
+        }
+      ]
+    }
+  ]
+}
